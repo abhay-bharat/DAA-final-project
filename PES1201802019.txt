@@ -1,0 +1,64 @@
+SRN:PES1201802019									DAA(UE18CS251) - Mini-project 
+Name : Abhay Pratap Singh                         Implimentation Of Intal Library
+
+
+1. Introduction:
+	(i)What is Intal?
+		Intal is a term we give to represent very large non-negative integers as an array of digits, represented in array of characters datatype. We can then write functions to add, multiply, subtract, etc. on those arrays, and then make them as large as we want.
+
+	(ii)How is it different from an integer in general and integer data types supported by C?
+		An integer in C is typically 32 bits(or 64 bits), of which 31 can be used for positive integer arithmetic. This is good for representing numbers up to about two billion (2 times 10^9).
+		Some compilers, such as GCC, offer a "long long" type, giving 64 bits capable of representing about 9 quintillion (9 times 10^18). But in scientific works and other practical applications, we require calculations of numbers which are of 1000s of digits.
+		To overcome these limitation, intal is a library where all the arithmetic and other functionalities that integers can implement, is made implementable by representing this very large numbers(typically upto 1000s of digits) as strings, i.e. representing digits as characters in array of characters. 
+
+	(iii)Applications of intal.
+		One of the application that I have personally come across is encrypting documents using RSA algorithm, Here the prime numbers that are considered, have 100s of digits(300 is optimal for practical applications). Now the algorithm involves some arithmetic computations and using intal is the way to go about it.
+		Other applications include, computing the probabilities of certain real events often involves very large numbers. Even in statistics large number computations are involved.
+
+2. Approach
+    a. Your approach in implementing the functionalities of intal.
+    	A very brief logic used for each function implementation is mentioned below:
+    	No memory leaks occur is ensured by freeing the allocated space to the variables that are used temporarily, the functions that are used in other functions return result, space for result which was allocated is also freed in the function which calls it. Verification with valgrind was done.
+
+    1)intal_add : The way we learnt addition of two numbers in our primary schools is used here, we iterate through digits(in reverse order) represented as characters untill one of them reach end of end of string, and add two digits and store carry and use it in next addition. Then check is performed that which number has exhausted and the other number is added with carry and stored in the variable storing result, untill that number too gets exhausted and append '\0' at end and return the result.
+
+    2)intal_compare : Since inputs with no leading 0 is given, the first check is performed with the length of two numbers, when length is equal we character one by one, and return 1 or -1 as soon as an inequality between digits is encountered.
+
+    3) intal_diff : First largest of two numbers is found and s1 will store the reverse of the this numbers and s2 reverse of other one(for this helper function reverse_string is used). Now we apply the method of subtraction we learnt in school, subtracting digit one by one.Finally we reverse the result string to obtain the final result and return it.
+
+    4) intal_multiply : A temporary integer array is created with all elements initialized to 0. The logic used is to compute the intermediate product(partial product) obtained by multipling each digit of multiplicand with multiplier digit one by one and store this in integer array, when multiplication with next digit is performed, last element of integer array is ignored and the intermediate product digits obtained is added one by one to the existing partial product and stored back to the array.
+    Finally when all digits of multiplier is exhausted the integer array is copied to character array and returned.
+
+    5) intal_mod : If intal1 is less than intal2, then intal2 is returned, if they are equal 0 is returned.For efficient modulus computation of very large numbers, the long division method learnt in school is used, each time only a portion of intal1, equal to length of intal2 is taken and computer_inter_mod is used to compute remainder of those two numbers by subtraction method and it is returned and this value is concatinated with the remaining digits of intal1(only if intermediate remainder not equal to 0), this process is continued untill the compare() returns 1. Finally the reaminder which is stored in temp_intal1 is returned, otherwise 0 is returned if intal1 is exhausted or intermediate number obtained becomes equal to intal2. 
+
+    6) intal_pow : Decrease by constant factor method is used, where the intal1^(n) is computed by first computing intal1^(n/2), by performing  and then the number obatined is multiplied with itself, if n is odd then finally a multiplication of result obtained is multiplied with intal1 and final result is returned.
+
+    7) intal_gcd : If both the intals are 0, then 0 is returned. If one of the intals is 1, 1 is returned.
+    Both the intals are stored seperately in temporary character array created. Then comp_gcd helper function is called, which uses Euclid's theorem recursively untill 2nd intal becomes 0 as modulus is applied on the intals and the 1st intal is returned.
+
+    8) intal_fibonacci : nth fibonacci is computed by using two temporary strings, prev1 initialized with 0 and prev2 initialized with 1, then iteratively result is obtained by adding prev1 and prev2, then copy prev2 to prev1 and result to prev2, untill nth fibonacci is obtained.
+
+    9) intal_factorial : if n=0, then 1 is returned, to obtain factorial of n, repeatative n multiplications are performed, since intal_multiply takes two intals, conversion of number to array of character of digits is done with the help of num_to_string function.
+
+    10) intal_bincoeff : Dynamic programming approach is used. For efficient implimentation few computations can be avoided if n>k, by reinitializing k to n-k, because nCk = nC(n-k).Now an array to store k+1(because arr[0] holds 1, and final result will be stored in arr[k]) intals is created and initialized with 0.
+    Two for loops, one keeping track of whether n iterations are performed and other to keep track of j iterations(i.e. min(i,k) iterations), the elements of dp array gets filled with each iteration by computing dp[j] = dp[j]+dp[j-1]. Finally remaining intals except the one stored in dp[k] is freed and dp[k] is returned.
+
+    11)intal max : A max element of array is obtained by traversing through it and performing compare on the current element and as far seen max element and updating the max offset value accordingly based on result of compare. At end of iteration offset of max element is returned.
+
+    12)intal_min : A min element of array is obtained by traversing through it and performing compare on the current element and as far seen min element and updating the min offset value accordingly based on result of compare. At end of iteration offset of min element is returned.
+
+    13) intal_search : This function returns the offset of the first occurence of the search element encountered, while performing a linear search.
+
+    14) intal_binsearch : This function implements the binary search algorithm and returns the offset. For each iteration half of the sorted array elements are discarded based on comparing with the middle element. If element is not found -1 is returned.
+
+    15) intal_sort : Quick sort algorithm is implemented here. intal_sort calls the quick_sort function and this function recursively calls itself untill the width of the array passed is >= 1, two partitions are done by partition function and quick_sort on each partition array is called. For partitioning, pivot is choosen as the first element and all elements less than pivot is stored on the left and the ones greater than or equal to pivot on the right. Swapping is done by swap by pointers approach.
+
+    16) coin_row_problem : Dynammic programming approach is used, since this is a optimization problem and the objective is to maximize the amount that can be picked subjected to constraint, three temporary vriables are sufficient to hold the temporary result using which the next values are computed and these variables are updated accordingly, this is done for n-1 iterations and the final result which is present in curr is returned.
+
+3. Future work (If you had time and interest)
+    a. Any more functionalities you think that can be included in the intal library?
+    	(i) Some of the standard formulae associated with probabilities, and other statistics could have been implemented, which would have been used in some large data analysis applications.
+        (ii) Division could have been included.
+
+        b. If you had no restrictions, how would you implement a library to handle integers of arbitrary length?
+        I think the current method of storing integers as array of character of digits is appropriate, but we can use scientic notations to represent large integers, then we could create a structure datatype, with two fields: one with the integer holding 1st 7 significant digits and other field having exponent value n(i.e. 10 raised to power n). Eg: 1.244568 x 10^29 (or) 1244568x10^23. This will reduce few computations but definitely effeciency would be at task. 
